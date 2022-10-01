@@ -17,17 +17,17 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = "fynesse"
-DESCRIPTION = "Template files for performing fynesse pipeline data analysis with python."
-URL = "https://github.com/lawrennd/fynesse_template"
-EMAIL = "emal@domain.here"
-AUTHOR = "Givenname Familyname"
-REQUIRES_PYTHON = ">=3.6.0"
+NAME = "meup"
+DESCRIPTION = "Set of packages for starting my day."
+URL = "https://github.com/lawrennd/meup"
+EMAIL = "neil@epokay.ai"
+AUTHOR = "Neil Lawrence"
+REQUIRES_PYTHON = ">=3.9.0"
 VERSION = "0.1.0"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    "pandas", "numpy", "jupyter", "matplotlib", 
+    "pandas", "numpy", "jupyter", "matplotlib", "tweepy", "referia",
 ]
 
 # What packages are optional?
@@ -35,7 +35,7 @@ EXTRAS = {
     "interactive html plots": ["bokeh",],
 }
 
-PACKAGE_DATA = {"fynesse": ["defaults.yml"]}
+PACKAGE_DATA = {"meup": ["defaults.yml"]}
 
 # The rest you shouldn't have to touch too much :)
 # ------------------------------------------------
