@@ -6,7 +6,7 @@ This is a simple library written for assisting with starting my day, making sure
 
 ### Twitter Access
 
-To obtain twitter access you need to add the following entries to your `_config.yml` file:
+To obtain twitter access you need to add the following entries to your `_meup.yml` file:
 
 ```
 twitter:
