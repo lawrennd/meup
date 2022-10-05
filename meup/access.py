@@ -11,10 +11,13 @@ import sqlite"""
 
 """Place commands in this file to access the data electronically. Don't remove any missing values, or deal with outliers. Make sure you have legalities correct, both intellectual property and personal data privacy rights. Beyond the legal side also think about the ethical issues around this data. """
 
-
-import tweepy
-import pandas as pd
+import os
+import fnmatch
 import datetime
+
+import pandas as pd
+import tweepy
+
 
 def twitter_client():
     """Return access to a twitter client."""
@@ -56,8 +59,33 @@ def twitter_get_tweets(client, following):
     
 def tweet_like(client, tweetid):
     """Return all the users that like a particular tweet"""
-    liking = client.get_liking_users(tweetid)
-    
+    twitter_liking = client.get_liking_users(tweetid)
+    data = {
+        "username": [],
+        "name": [],
+        "id": [],
+        }
+    for user in twitter_liking.data:
+        data["username"].append(user.username)
+        data["name"].append(user.name)
+        data["id"].append(user.id)
+    return pd.DataFrame(data=data).set_index("id")
+
+
+def file_locations(top_dir, pattern, exclude_dir_prefix=None):
+    try:
+        for dir_path, dir_names, file_names in os.walk(top_dir):
+                for file_name in file_names:
+                    if not exclude_dir_prefix or not get_file_name(dir_path).startswith(exclude_dir_prefix):
+                        if fnmatch.fnmatch(file_name, pattern):
+                            yield os.path.join(dir_path, file_name)
+    except (IOError, OSError) as ex:
+        raise e.LoadFileException(str(ex)+'\nUnable to load ' + top_dir + ' with pattern ' + pattern + ' excluding ' + exclude_dir_prefix)
+
+def referia_locations(dir):
+    """Find referia locations."""
+    return file_locations(dir, "_referia.yml")
+
 # You can provide the consumer key and secret with the access token and access
 # token secret to authenticate as a user
 #client = tweepy.Client(
