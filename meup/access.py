@@ -24,14 +24,20 @@ def twitter_client():
 
     bearer_token = config["twitter"]["bearer_token"]
 
+    # You can authenticate as your app with just your bearer token
+    return tweepy.Client(bearer_token=bearer_token)
+
+def twitter_api():
+    """Return access to the twitter API."""
     consumer_key = config["twitter"]["consumer_key"]
     consumer_secret = config["twitter"]["consumer_secret"]
 
     access_token = config["twitter"]["access_token"]
     access_token_secret = config["twitter"]["access_token_secret"]
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    return tweepy.API(auth)
 
-    # You can authenticate as your app with just your bearer token
-    return tweepy.Client(bearer_token=bearer_token)
 
 def twitter_following(client):
     """Return a list of twitter users I'm following."""
@@ -47,15 +53,22 @@ def twitter_following(client):
     following.set_index("id", inplace=True)
     return following
 
-def twitter_get_tweets(client, following):
-    """Get tweets from those that user is following."""
-    for user_id in following.index:
+def twitter_get_tweets(client, users, max_results=5):
+    """Get tweets from those in a user list."""
+    tweets = []
+    for user_id in users.index:
         response = client.get_users_tweets(user_id, 
-                                           max_results=5,
+                                           max_results=max_results,
                                            end_time=datetime.datetime.now() - datetime.timedelta(days=1))
-        username = following.loc[user_id]["username"]
-        name = following.loc[user_id]["name"]
-    return response
+        for tweet in response.data:
+            tweets.append({
+                "id":  tweet.id,
+                "text":  tweet.text,
+                "username": users.loc[user_id]["username"],
+                "name": users.loc[user_id]["name"],
+                "user_id": user_id,
+	})
+    return pd.DataFrame(tweets).set_index("id")
     
 def tweet_like(client, tweetid):
     """Return all the users that like a particular tweet"""

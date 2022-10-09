@@ -20,11 +20,15 @@ def useful_links():
 
 def tweets(tweets):
     """Display tweets to an Jupyter notebook"""
-    for tweet in tweets.data:
-        tweetid = tweet.id
-        text = tweet.text
-        display(HTML(f"""<p><a href="https://twitter.com/{username}" target="_blank">{name}</a><br>
-<a href="https://twitter.com/i/web/status/{tweetid}" target="_blank">{tweetid}</a><br>
-{text}</p>"""))    
+    for tweet in tweets:
+        tweetid = tweet["id"]
+        text = tweet["text"]
+        name = tweet["name"]
+        username = tweet["username"]
+        link(link=f"https://twitter.com/{username}",
+             label=name)
+        link(link=f"https://twitter.com/i/web/status/{tweetid}",
+             label=tweetid,
+             description=text)     
 
 
