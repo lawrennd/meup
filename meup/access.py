@@ -1,4 +1,12 @@
+import os
+import fnmatch
+import datetime
+
+import pandas as pd
+import tweepy
+
 from .config import *
+from .log import Logger
 
 """These are the types of import we might expect in this file
 import httplib2
@@ -7,16 +15,18 @@ import tables
 import mongodb
 import sqlite"""
 
+
 # This file accesses the data
 
 """Place commands in this file to access the data electronically. Don't remove any missing values, or deal with outliers. Make sure you have legalities correct, both intellectual property and personal data privacy rights. Beyond the legal side also think about the ethical issues around this data. """
 
-import os
-import fnmatch
-import datetime
 
-import pandas as pd
-import tweepy
+
+log = Logger(
+    name=__name__,
+    level=config["logging"]["level"],
+    filename=config["logging"]["filename"]
+)
 
 
 def twitter_client():
@@ -31,7 +41,7 @@ def twitter_api():
     """Return access to the twitter API."""
     consumer_key = config["twitter"]["consumer_key"]
     consumer_secret = config["twitter"]["consumer_secret"]
-
+    
     access_token = config["twitter"]["access_token"]
     access_token_secret = config["twitter"]["access_token_secret"]
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -46,11 +56,20 @@ def twitter_following(client):
     names = []
     for username in following.username:
         user = client.get_user(username=username)
-        ids.append(user.data.id)
+        if user.data is None:
+            if user.errors is not None:
+                log.warning(f"Error when requesting twitterid \"{username}\"")
+                ids.append("delete_row")
+                names.append(None)
+                continue
+            else:
+                raise Exception(f"Not able to access data for twitterid \"{username}\"")
+        ids.append(int(user.data.id))
         names.append(user.data.name)
     following["id"] = ids
     following["name"] = names
     following.set_index("id", inplace=True)
+    following.drop("delete_row", inplace=True)
     return following
 
 def twitter_get_tweets(client, users, max_results=5):

@@ -20,8 +20,8 @@ def useful_links():
 
 def tweets(tweets):
     """Display tweets to an Jupyter notebook"""
-    for tweet in tweets:
-        tweetid = tweet["id"]
+    for index, tweet in tweets.iterrows():
+        tweetid = index
         text = tweet["text"]
         name = tweet["name"]
         username = tweet["username"]
